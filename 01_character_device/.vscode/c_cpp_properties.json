@@ -1,0 +1,33 @@
+{
+  "configurations": [
+    {
+      "name": "Kernel Module",
+      "includePath": [
+        "/lib/modules/6.8.0-60-generic/build/include",
+        "/lib/modules/6.8.0-60-generic/build/include/uapi",
+        "/lib/modules/6.8.0-60-generic/build/include/generated/uapi",
+        "/lib/modules/6.8.0-60-generic/build/arch/x86/include",
+        "/lib/modules/6.8.0-60-generic/build/arch/x86/include/uapi"
+      ],
+      "defines": [
+        "__KERNEL__",
+        "MODULE"
+      ],
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "gnu++17",
+      "compilerArgs": [
+        "-nostdinc",
+        "-I/lib/modules/6.8.0-60-generic/build/include",
+        "-I/lib/modules/6.8.0-60-generic/build/include/uapi",
+        "-I/lib/modules/6.8.0-60-generic/build/include/generated/uapi",
+        "-I/lib/modules/6.8.0-60-generic/build/arch/x86/include",
+        "-I/lib/modules/6.8.0-60-generic/build/arch/x86/include/uapi"
+      ]
+    }
+  ],
+  "version": 4,
+  "files.associations": {
+    "fs.h": "c"
+  },
+}
