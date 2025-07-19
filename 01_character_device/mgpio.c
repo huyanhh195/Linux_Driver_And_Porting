@@ -84,18 +84,22 @@ void __exit pi_driver_exit(){
 }
 
 int pi_open(struct inode *, struct file *){
+    pr_info("Device open...\n");
     return 0;
 }
 
 int pi_release(struct inode *, struct file *){
+    pr_info("Device close...\n");
     return 0;
 }
 
 ssize_t pi_read (struct file *, char __user *, size_t, loff_t *){
+    pr_info("Device read...\n");
     return 1;
 }
 
 ssize_t pi_write (struct file *, const char __user *, size_t, loff_t *){
+    pr_info("Device write...\n");
     return 1;
 }
 
