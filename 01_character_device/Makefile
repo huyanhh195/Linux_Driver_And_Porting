@@ -10,4 +10,3 @@ all: clean
 
 clean:
 	make -C $(KDIR) M=$(PWD) clean	
-	clear
