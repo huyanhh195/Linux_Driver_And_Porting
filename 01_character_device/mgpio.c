@@ -1,9 +1,23 @@
+#include <linux/version.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6, 0, 0)
+    #define BUILD_PI
+#endif
+
 #include <linux/fs.h>
 #include <linux/kdev_t.h>
 #include <linux/device.h> 
 #include <linux/module.h>
 #include <linux/cdev.h>
 #include <linux/uaccess.h>
+
+#ifdef BUILD_PI
+    #include <linux/io.h>
+    #define GPIO_PIN_27 23
+    #define BASE_ADDR 0x7e200000
+    #define GPFSEL2_OFFSET 0x08
+    #define GPSET0_OFFSET 0x1C
+    void gpio_mode(void __iomem *gpio_base, int gpio_pin, int mode);
+#endif  
 
 #define BUFFER_SIZE 256
 #define DRIVE_NAME "gpio"
@@ -49,7 +63,11 @@ int __init pi_driver_init(){
         goto unregister_cdev;
     }
 
+#ifdef BUILD_PI
     pi_class = class_create(THIS_MODULE, CLASS_NAME);
+#else
+    pi_class = class_create(CLASS_NAME);
+#endif
     if(IS_ERR(pi_class)){
         pr_warn("Cannot create class");
         goto destroy_cdev;
@@ -60,6 +78,25 @@ int __init pi_driver_init(){
         pr_warn("Cannot add device file");
         goto destroy_class;
     }
+
+#ifdef BUILD_PI
+    void __iomem *gpio_base;
+    int value_register = 0;
+    
+    gpio_base = ioremap(BASE_ADDR, 0x1000);
+    if (!gpio_base) {
+        pr_err("ioremap failed\n");
+        return -ENOMEM;
+    }
+    
+    value_register = ioread32(gpio_base + GPFSEL2_OFFSET);
+    value_register &= ~(1 << 9);
+    value_register |= (1 << 9);
+
+    iowrite32(value_register, gpio_base + GPFSEL2_OFFSET);
+    iowrite32((1 << 23), gpio_base + GPSET0_OFFSET);
+}
+#else
 
     pr_info("PI GPIO driver loaded. Major: %d, Minor: %d\n", MAJOR(pi_dev_num), MINOR(pi_dev_num));
     return 0;
@@ -93,13 +130,43 @@ int pi_release(struct inode *, struct file *){
     return 0;
 }
 
-ssize_t pi_read (struct file *, char __user *, size_t, loff_t *){
+ssize_t pi_read(struct file *, char __user *, size_t, loff_t *){
+
     return 1;
 }
 
-ssize_t pi_write (struct file *, const char __user *, size_t, loff_t *){
+ssize_t pi_write(struct file *, const char __user *, size_t, loff_t *){
+    
     return 1;
 }
+
+#ifdef BUILD_PI
+void gpio_mode(void __iomem *gpio_base, int gpio_pin, int mode){
+    return 0;
+}
+
+static int __init mygpio_init(void)
+{
+    unsigned int reg;
+
+    gpio_base = ioremap(GPIO_BASE, SZ_4K);
+    if (!gpio_base) {
+        pr_err("Failed to map GPIO\n");
+        return -ENOMEM;
+    }
+
+    reg = ioread32(gpio_base + GPFSEL2);
+    reg &= ~(7 << ((21 % 10) * 3));
+    reg |=  (1 << ((21 % 10) * 3));
+    iowrite32(reg, gpio_base + GPFSEL2);
+
+    // Bật LED
+    iowrite32((1 << 21), gpio_base + GPSET0);
+
+    pr_info("GPIO21 set as output and LED ON\n");
+    return 0;
+}
+#endif 
 
 module_init(pi_driver_init);
 module_exit(pi_driver_exit);

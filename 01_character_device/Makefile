@@ -1,12 +1,10 @@
 obj-m += mgpio.o
 
-# KDIR := /lib/modules/$(shell uname -r)/build
-KDIR := $(KERNEL_SRC)
+KERNEL_SRC ?= /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
 
 all: clean
-	make -C $(KDIR) M=$(PWD) modules
-
+	make -C $(KERNEL_SRC) M=$(PWD) modules
 
 clean:
-	make -C $(KDIR) M=$(PWD) clean	
+	make -C $(KERNEL_SRC) M=$(PWD) clean	
