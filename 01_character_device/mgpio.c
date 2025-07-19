@@ -32,7 +32,9 @@ static struct file_operations pi_fops = {
 };
 
 int __init pi_driver_init(){
-    int err = alloc_chrdev_region(&pi_dev_num, MINOR_BASE, MINOR_COUNT, DRIVE_NAME);
+    int err = 0, ret = 0;
+
+    err = alloc_chrdev_region(&pi_dev_num, MINOR_BASE, MINOR_COUNT, DRIVE_NAME);
     if (err != 0){
         printk(KERN_WARNING "Cannot allocate device numer");
         return err;
@@ -41,13 +43,13 @@ int __init pi_driver_init(){
     cdev_init(&pi_cdev, &pi_fops);
     pi_cdev.owner = THIS_MODULE;
     
-    int ret = cdev_add(&pi_cdev, pi_dev_num, MINOR_COUNT);
+    ret = cdev_add(&pi_cdev, pi_dev_num, MINOR_COUNT);
     if(ret != 0){
         pr_warn("Cannot add cdev");
         goto unregister_cdev;
     }
 
-    pi_class = class_create(CLASS_NAME);
+    pi_class = class_create(THIS_MODULE, CLASS_NAME);
     if(IS_ERR(pi_class)){
         pr_warn("Cannot create class");
         goto destroy_cdev;
