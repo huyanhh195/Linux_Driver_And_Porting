@@ -12,11 +12,12 @@
 
 #ifdef BUILD_PI
     #include <linux/io.h>
-    #define GPIO_PIN_27 23
+    #define GPIO_PIN_23 23
     #define BASE_ADDR 0x7e200000
     #define GPFSEL2_OFFSET 0x08
     #define GPSET0_OFFSET 0x1C
     void gpio_mode(void __iomem *gpio_base, int gpio_pin, int mode);
+    static void __iomem *gpio_base;
 #endif  
 
 #define BUFFER_SIZE 256
@@ -81,7 +82,7 @@ int __init pi_driver_init(){
     }
 
 #ifdef BUILD_PI
-    void __iomem *gpio_base;
+    
     int value_register = 0;
     
     gpio_base = ioremap(BASE_ADDR, 0x1000);
@@ -120,6 +121,10 @@ void __exit pi_driver_exit(){
     class_destroy(pi_class);
     cdev_del(&pi_cdev);
     unregister_chrdev_region(pi_dev_num, MINOR_COUNT);
+#ifdef BUILD_PI
+    if (gpio_base)
+        iounmap(gpio_base);
+#endif
     printk(KERN_INFO "Removed PI Driver");
 }
 
