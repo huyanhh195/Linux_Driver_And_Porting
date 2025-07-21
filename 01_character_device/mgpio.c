@@ -123,7 +123,7 @@ void __exit pi_driver_exit(){
     unregister_chrdev_region(pi_dev_num, MINOR_COUNT);
 #ifdef BUILD_PI
     if (gpio_base){
-        iowrite32((1 << 23), gpio_base + GPCLR0_OFFSET);
+        iowrite32((1 << 23), gpio_base + GPSET0_OFFSET);
         iounmap(gpio_base);
     }
 #endif
@@ -168,7 +168,6 @@ static int __init mygpio_init(void)
     reg |=  (1 << ((21 % 10) * 3));
     iowrite32(reg, gpio_base + GPFSEL2_OFFSET);
 
-    // Bật LED
     iowrite32((1 << 21), gpio_base + GPSET0_OFFSET);
 
     pr_info("GPIO21 set as output and LED ON\n");
