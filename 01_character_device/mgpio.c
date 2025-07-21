@@ -68,6 +68,7 @@ int __init pi_driver_init(){
 #else
     pi_class = class_create(CLASS_NAME);
 #endif
+
     if(IS_ERR(pi_class)){
         pr_warn("Cannot create class");
         goto destroy_cdev;
@@ -95,7 +96,7 @@ int __init pi_driver_init(){
 
     iowrite32(value_register, gpio_base + GPFSEL2_OFFSET);
     iowrite32((1 << 23), gpio_base + GPSET0_OFFSET);
-}
+
 #endif
 
     pr_info("PI GPIO driver loaded. Major: %d, Minor: %d\n", MAJOR(pi_dev_num), MINOR(pi_dev_num));
@@ -155,13 +156,13 @@ static int __init mygpio_init(void)
         return -ENOMEM;
     }
 
-    reg = ioread32(gpio_base + GPFSEL2);
+    reg = ioread32(gpio_base + GPFSEL2_OFFSET);
     reg &= ~(7 << ((21 % 10) * 3));
     reg |=  (1 << ((21 % 10) * 3));
-    iowrite32(reg, gpio_base + GPFSEL2);
+    iowrite32(reg, gpio_base + GPFSEL2_OFFSET);
 
     // Bật LED
-    iowrite32((1 << 21), gpio_base + GPSET0);
+    iowrite32((1 << 21), gpio_base + GPSET0_OFFSET);
 
     pr_info("GPIO21 set as output and LED ON\n");
     return 0;
