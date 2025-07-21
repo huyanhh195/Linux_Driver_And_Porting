@@ -143,14 +143,14 @@ ssize_t pi_write(struct file *, const char __user *, size_t, loff_t *){
 
 #ifdef BUILD_PI
 void gpio_mode(void __iomem *gpio_base, int gpio_pin, int mode){
-    return 0;
+    
 }
 
 static int __init mygpio_init(void)
 {
     unsigned int reg;
 
-    gpio_base = ioremap(GPIO_BASE, SZ_4K);
+    gpio_base = ioremap(BASE_ADDR, SZ_4K);
     if (!gpio_base) {
         pr_err("Failed to map GPIO\n");
         return -ENOMEM;
