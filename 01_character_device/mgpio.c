@@ -96,7 +96,7 @@ int __init pi_driver_init(){
     iowrite32(value_register, gpio_base + GPFSEL2_OFFSET);
     iowrite32((1 << 23), gpio_base + GPSET0_OFFSET);
 }
-#else
+#endif
 
     pr_info("PI GPIO driver loaded. Major: %d, Minor: %d\n", MAJOR(pi_dev_num), MINOR(pi_dev_num));
     return 0;
